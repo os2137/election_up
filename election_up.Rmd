@@ -1,0 +1,113 @@
+---
+title: "election_up"
+author: "Onkar Singh"
+date: "11/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lobstr)
+library(arrow)
+```
+
+
+```{r}
+up <- read_csv("TCPD_AE_Uttar_Pradesh_2021-11-20.csv") %>% 
+  janitor::clean_names()
+```
+
+```{r}
+dim(up)
+glimpse(up)
+```
+
+```{r}
+lobstr::obj_size(up)
+```
+
+```{r}
+write_parquet(up, "up.parquet")
+```
+
+```{r}
+up_pqt <- read_parquet("up.parquet")
+up_pqt
+```
+```{r}
+lobstr::obj_size(up_pqt)
+```
+
+
+```{r}
+up_pqt %>% 
+  count(year)
+```
+
+
+```{r}
+up_pqt %>% 
+  count(assembly_no)
+```
+
+```{r}
+up_pqt %>% 
+  count(constituency_no)
+```
+
+All the months when election happened
+```{r}
+up_pqt %>% 
+  count(month)
+```
+
+Constituency Types as per 2017 election 
+```{r}
+up_pqt %>% 
+  filter(position ==1) %>% 
+  filter(year == 2017) %>% 
+  count(constituency_type)
+```
+
+Total parties so far
+
+```{r}
+up_pqt %>% 
+  count(party)
+```
+Total parties in 2017 election
+
+```{r}
+up_pqt %>% 
+  filter(year == 2017) %>% 
+  count(party)
+
+```
+## sub region in UP
+
+```{r}
+up %>% count(district_name)
+```
+
+# Total Number of Male and Female Candidate in 2017 election 
+```{r}
+up %>% 
+  filter(year == 2017) %>% 
+  count(sex) %>%
+  janitor:: adorn_totals()
+```
+# Total number of unique value counts for double columns
+
+
+```{r}
+up %>% 
+purrr::map_dbl(n_distinct)
+
+
+```
+
